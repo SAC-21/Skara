@@ -5,12 +5,11 @@ function landing(){
     return (<div>
         <ul>
         <Link to="/teacher_register">
-      <li>Teacher Register</li></Link>
-      <Link to="/login">
-      <li>
-        Login
-      </li>
-      </Link>
+          <li>Teacher Register</li>
+        </Link>
+        <Link to="/login">
+          <li>Login</li>
+        </Link>
     </ul>
     </div>
     )

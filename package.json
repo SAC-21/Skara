@@ -4,12 +4,16 @@
   "description": "The Server modules for Skara: ONline CLassroom Manager",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently -n 'server,client' -c 'green,red' \"nodemon server.js\" \"npm run client\"",
+    "client": "cd client && npm start"
   },
   "author": "Nimit Bhatia",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.21.1",
     "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
     "mongoose": "^5.12.0",

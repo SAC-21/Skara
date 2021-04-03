@@ -1,22 +1,36 @@
 // Requiring and initializing the express object
 const express = require("express");
 const mongoose=require('mongoose');
-const bodyParser=require('body-parser');
+// const bodyParser=require('body-parser');
 const ejs=require('ejs');
 const morgan=require("morgan");
+const cors = require("cors");
 
 const app=express();
 const PORT=process.env.PORT||8080;
 
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.use(morgan('tiny'));
+// A kind of bodyParser. It makes the json objects available.
+app.use(express.json());
+app.use(express.urlencoded({
+  extended: true
+}))
+
+// CORS error
+app.use(cors({
+  origin: "http://localhost:3000/",
+  credentials: true
+}));
 
 mongoose.connect("mongodb://localhost:27017/teacher",{useNewUrlParser:true,useUnifiedTopology:true});
+
 const teacherSchema=new mongoose.Schema({
-  name:String,
+  fn:String,
   email:String,
-  password:String
+  pw:String,
+  classesEnrolled:[]
 });
 const teacher=mongoose.model('teacher',teacherSchema);
 
@@ -27,53 +41,39 @@ const classroomSchema=new mongoose.Schema({
 });
 const classroom=mongoose.model("classroom",classroomSchema);
 
-// This get function throws html our home page once the sever gets called on default port 3000.
-app.get('/',function(req, res){
-  res.sendFile(__dirname + '/html_files/index.html');
-});
-
-// This get funstion listens opens up the register page when register butto is clicked upon on the home page
-app.get('/register/teacher', function(req,res){
-  res.sendFile(__dirname + '/html_files/teacher_register.html');
-});
-//Handles login route
-app.get("/login",function(req,res){
-  res.sendFile(__dirname+"/html_files/login.html")
-}) ;
-
-//page after registeration or login
-app.get("/home",function(req,res){
-  res.sendFile(__dirname+"/html_files/home.html")
-});
-
-//when teacher clicks on create a classroom
-app.get("/createclassroom",function(req,res){
-  res.sendFile(__dirname+"/html_files/createclassroom.html")
-});
+app.get("/dashboard/:email",function(req,res){
+  teacher.findOne({email:req.params.email},function(err,foundTeacher){
+    if(err){
+      console.log(err);
+    }
+    else{
+      res.status(200).json({"classesEnrolled":foundTeacher});
+    }
+  })
+})
 
 
 //handles post request when users login or registered
-app.post("/home",function(req,res){
+app.post("/teacher_register",function(req,res){
   const data=new teacher({
-    name:req.body.fn,
+    fn:req.body.fn,
     email:req.body.email,
-    password:req.body.pw
+    pw:req.body.pw,
+    classesEnrolled:[]
   });
-  teacher.findOne({email:req.body.email},function(err,foundTeacher){
+  teacher.findOne({email:data.email},function(err,foundTeacher){
     if(err){
       console.log(err);
     }
     else{
       if(foundTeacher){
-        // res.send("Email already exists.");
-        res.redirect("/login");
+        console.log("Email already exists. Try another account.");
+        // res.redirect("/login");
       }
       else{
         data.save(function(err){
           if(!err){
-            
-  res.redirect('/home');
-          console.log("success");
+          res.status(200).json({email:data.email});
         }
       });
       }
@@ -82,19 +82,26 @@ app.post("/home",function(req,res){
 })
 //handles login information
 app.post("/login",function(req,res){
-  teacher.findOne({email:req.body.email},function(err,foundUser){
+  const enteredEmail=req.body.email;
+  const enteredPassword=req.body.password;
+  teacher.findOne({email:enteredEmail},function(err,foundUser){
     if(err){
       console.log(err);
     }
     else{
-      if(foundUser){
-        if(foundUser.password===req.body.password){
-          res.redirect("/home");
+        if(foundUser&& foundUser.email===enteredEmail && foundUser.pw===enteredPassword){
+          res.status(200).json({email:enteredEmail});
+          // Send user to dashboard
+          console.log("user found");
         }
-      }
+        else{
+          console.log("Enter correct password");
+        }
+      
     }
   });
 });
+
 
 //storing name and id of a classroom
 function makeid(length) {
@@ -106,23 +113,36 @@ function makeid(length) {
   }
   return result;
 }
-app.post("/createclassroom",function(req,res){
+app.post("/createclassroom/:email",function(req,res){
   
-  const data=new classroom({
-  id:makeid(6),
-  name:req.body.name,
-  participantList:["sachin"]
-  });
-  data.save(function(err){
-    if(!err){
-    console.log('success');
-  }
-  res.redirect('/home');
-  })
+  teacher.findOne({email:req.params.email},function(err,foundTeacher){
+    if(err){
+      console.log(err);
+    }
+    else{
+      const data=new classroom({
+        id:makeid(6),
+        name:req.body.className,
+        participantList:[foundTeacher.name]
+        });    
+        foundTeacher.classesEnrolled.push([data.name,data.id]);
+        foundTeacher.save(function(err){
+          if(!err){
+            console.log("teacher updated")
+          }
+        })
+          data.save(function(err){
+          if(!err){
+          console.log("Classroom created.")
+        }
+      });
+    }
+  })   
 });
 
 
-// Listening to the port 3000.
+
+// Listening to the port 8080.
 app.listen(PORT, function(){
   console.log("Server is listening to port 8080.");
 });
