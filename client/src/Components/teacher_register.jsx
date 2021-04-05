@@ -8,7 +8,8 @@ function Teacher_Register(){
         fn:"",
         email:"",
         pw:"",
-        classesEnrolled:[]
+        classesEnrolled:[],
+        invitesPending:[]  
     });
 function handleSubmit(){
     axios({
@@ -17,7 +18,8 @@ function handleSubmit(){
             fn:details.fn,
             email:details.email,
             pw:details.pw,
-            classesEnrolled:[]
+            classesEnrolled:[],
+            invitesPending:[]
         },
         withCredentials:true,
        url:"http://localhost:8080/teacher_register",
@@ -57,9 +59,9 @@ function handleChange(event){
             fn: "",
             email: "",
             pw: "",
-            classesEnrolled:[]
+            classesEnrolled:[],
+            invitesPending:[]
           });
-          return;
         }}>Submit</button>
     </form>
         </div>

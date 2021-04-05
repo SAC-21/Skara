@@ -14,7 +14,7 @@ const {email}=useParams();
     method: 'GET',
     url: 'http://localhost:8080/dashboard/'+email    // responseType: 'stream'
   })
-    .then(async(res)=> {
+    .then((res)=> {
       if(res.data.classesEnrolled.classesEnrolled.length!==classesData.classesEnrolled.length)
       {
       setClassesData(res.data.classesEnrolled);
@@ -28,7 +28,7 @@ const {email}=useParams();
         <li>Create Classroom</li>
       </Link>
       {classesData.classesEnrolled.map((classroom,index)=>(
-            <Classcard id={classroom[1]} name={classroom[0]}/>
+            <Classcard id={classroom.classCode} name={classroom.className}/>
         ))}
       </div>
     )
