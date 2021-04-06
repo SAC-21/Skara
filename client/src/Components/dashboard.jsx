@@ -17,6 +17,7 @@ const {email}=useParams();
     .then((res)=> {
       if(res.data.classesEnrolled.classesEnrolled.length!==classesData.classesEnrolled.length)
       {
+        console.log(res.data.classesEnrolled,"dasboard");
       setClassesData(res.data.classesEnrolled);
       }
     });
@@ -27,6 +28,7 @@ const {email}=useParams();
       <Link to={url}>
         <li>Create Classroom</li>
       </Link>
+     
       {classesData.classesEnrolled.map((classroom,index)=>(
             <Classcard id={classroom.classCode} name={classroom.className}/>
         ))}

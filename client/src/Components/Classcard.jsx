@@ -1,17 +1,16 @@
+// import axios from 'axios';
 import React from 'react';
 import {Link,useParams} from 'react-router-dom';
 function Classcard(props){
 
     const{email}=useParams();
-    
-    // let {pro}={props.id};
-    // console.log(pro);
+    const url="/classroom/"+email+"/"+props.id;
     return(
     <div>
 
-    <Link to={"/classroom/"+email+"/"}>
+    <Link to={url}>
         <li>{props.name}</li>
-        </Link>
+        </Link> 
         <li>{props.id}</li>
     </div>
 )

@@ -9,14 +9,16 @@ const classSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectID,
     ref: 'teacher'
   }],
-  announcements: [{
-    author: {
-      type: mongoose.Schema.Types.ObjectID,
-      ref: 'teacher'
-    },
-    text: String,
-    time: Date
-  }]
+  announcements: [
+    // {
+    // author: {
+    //   type: mongoose.Schema.Types.ObjectID,
+    //   ref: 'teacher'
+    // },
+    // text: String
+    // time: Date
+  // }
+]
 });
 const classroom = mongoose.model('classroom', classSchema);
 

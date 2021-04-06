@@ -52,6 +52,20 @@ app.get("/dashboard/:email", function (req, res) {
   });
 });
 
+app.get("/classpane/:email/:id",function(req,res){
+  console.log(req.params.email);
+  console.log(req.params.id);
+  classroom.findOne({classCode:req.params.id},function(err,foundClass){
+    // console.log(foundClass);
+    if(err){
+      console.log(err);
+    }
+    else{
+      res.status(200).json({"class":foundClass});
+    }
+  })
+})
+
 //handles post request when users login or registered
 app.post("/teacher_register", function (req, res) {
   const data = new teacher({
@@ -138,6 +152,24 @@ app.post("/createclassroom/:email", function (req, res) {
     }
   });
 });
+app.post("/createAnnouncement/:email/:id",function(req,res){
+  // console.log(req.email);
+  classroom.findOne({ classCode: req.params.id }, function (err, foundClass) {
+    console.log(foundClass,"asdasd")
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(req.body.announcement);
+      foundClass.announcements.push(req.body.announcement);
+      console.log(foundClass.announcements,"asdaasd");
+      foundClass.save(function (err) {
+        if (!err) {
+          console.log("Succesfully added announcement");   
+        }
+      });
+    }
+  });
+})
 
 // Listening to the port 8080.
 app.listen(PORT, function () {
