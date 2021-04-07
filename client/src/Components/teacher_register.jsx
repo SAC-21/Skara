@@ -62,6 +62,7 @@ function handleChange(event){
             classesEnrolled:[],
             invitesPending:[]
           });
+          return;
         }}>Submit</button>
     </form>
         </div>

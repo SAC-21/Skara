@@ -39,6 +39,13 @@ const student = require("./models/studentModel.js");
 const teacher = require("./models/teacherModel.js");
 const team = require("./models/teamModel.js");
 
+// const teams=new team({
+//   teamName:"Hagemaru Clan",
+//   classAssociated:"606d67a51016184b78b997ea"
+// })
+// teams.save();
+
+//display dashboard of teacher (shows classes in which teacher is enrolled)
 app.get("/dashboard/:email", function (req, res) {
   teacher
   .findOne({ email: req.params.email })
@@ -52,16 +59,28 @@ app.get("/dashboard/:email", function (req, res) {
   });
 });
 
+// display info of a particular class
 app.get("/classpane/:email/:id",function(req,res){
-  console.log(req.params.email);
-  console.log(req.params.id);
   classroom.findOne({classCode:req.params.id},function(err,foundClass){
-    // console.log(foundClass);
     if(err){
       console.log(err);
     }
     else{
       res.status(200).json({"class":foundClass});
+    }
+  })
+})
+
+
+app.get("/team/:email/:id",function(req,res){
+  classroom
+  .findOne({classCode:req.params.id})
+  .populate("teams")
+  .exec(function(err,foundClass){
+    if(err){
+      console.log(err)
+    }else{
+      res.status(200).json({"teams":foundClass.teams});
     }
   })
 })
@@ -126,8 +145,9 @@ function makeid(length) {
   }
   return result;
 }
+//creates classroom inside classroom model and link it with teacher id
 app.post("/createclassroom/:email", function (req, res) {
-  console.log("inside post of create classroom");
+  
   teacher.findOne({ email: req.params.email }, function (err, foundTeacher) {
     if (err) {
       console.log(err);
@@ -137,10 +157,10 @@ app.post("/createclassroom/:email", function (req, res) {
         classCode: makeid(6),
         teachers: [foundTeacher._id],
         announcements: [],
+        teams:"606d6de3dcc36b45a8fe9091"
       });
       data.save(function (err, result) {
         if (!err) {
-          console.log(result);
           foundTeacher.classesEnrolled.push(result._id);
           foundTeacher.save(function (err) {
             if (!err) {
@@ -152,21 +172,28 @@ app.post("/createclassroom/:email", function (req, res) {
     }
   });
 });
+
+// stores announcement inside classroom model 
 app.post("/createAnnouncement/:email/:id",function(req,res){
-  // console.log(req.email);
+  const event = new Date();
+
   classroom.findOne({ classCode: req.params.id }, function (err, foundClass) {
-    console.log(foundClass,"asdasd")
     if (err) {
       console.log(err);
     } else {
-      console.log(req.body.announcement);
-      foundClass.announcements.push(req.body.announcement);
-      console.log(foundClass.announcements,"asdaasd");
-      foundClass.save(function (err) {
-        if (!err) {
-          console.log("Succesfully added announcement");   
+      teacher.findOne({email:req.params.email},function(err,foundTeacher){
+        const data={
+          author:foundTeacher.fn,
+          text:req.body.announcement,
+          time:event.toLocaleDateString('en-US')
         }
-      });
+        foundClass.announcements.push(data);
+        foundClass.save(function(err){
+          if (!err) {
+            console.log("Succesfully added announcement");   
+          }
+        })
+      })
     }
   });
 })

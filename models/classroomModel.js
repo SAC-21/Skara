@@ -10,15 +10,16 @@ const classSchema = new mongoose.Schema({
     ref: 'teacher'
   }],
   announcements: [
-    // {
-    // author: {
-    //   type: mongoose.Schema.Types.ObjectID,
-    //   ref: 'teacher'
-    // },
-    // text: String
-    // time: Date
-  // }
-]
+    {
+    author: String,
+    text: String,
+    time: String
+  }
+],
+teams:[{
+  type:mongoose.Schema.Types.ObjectID,
+  ref:'team'
+}]
 });
 const classroom = mongoose.model('classroom', classSchema);
 

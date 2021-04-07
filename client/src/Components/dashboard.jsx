@@ -17,7 +17,6 @@ const {email}=useParams();
     .then((res)=> {
       if(res.data.classesEnrolled.classesEnrolled.length!==classesData.classesEnrolled.length)
       {
-        console.log(res.data.classesEnrolled,"dasboard");
       setClassesData(res.data.classesEnrolled);
       }
     });

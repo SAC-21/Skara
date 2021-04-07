@@ -9,6 +9,7 @@ import { Switch,Route} from 'react-router-dom';
 // import Classcard from './Components/Classcard';
 import ClassPane from './Components/ClassPane';
 import createAnnouncement from "./Components/CreateAnnouncement";
+import TeamPane from "./Components/TeamPane";
 
 function App() {
     return <div>
@@ -20,6 +21,7 @@ function App() {
     <Route path="/createClassroom/:email" component={createClassroom}/>
     <Route path="/createAnnouncement/:email/:id" component={createAnnouncement}/>
     <Route path="/classroom/:email/:id" component={ClassPane}/>
+    <Route path="/teams/:email/:id" component={TeamPane}/>
     </Switch>
     </div>
 }

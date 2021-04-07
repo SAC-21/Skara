@@ -7,8 +7,7 @@ function Classcard(props){
     const url="/classroom/"+email+"/"+props.id;
     return(
     <div>
-
-    <Link to={url}>
+        <Link to={url}>
         <li>{props.name}</li>
         </Link> 
         <li>{props.id}</li>
