@@ -23,9 +23,11 @@ function handleSubmit(){
         },
         withCredentials:true,
        url:"http://localhost:8080/teacher_register",
-    }).then((res)=>{
-        var queryExtender=res.data.username;
-        history.push("/dashboard/"+queryExtender);
+    })
+    .then((res)=>{
+        console.log(res.data);
+        // var queryExtender=res.data.username;
+        // history.push("/dashboard/"+queryExtender);
     });
 
 }
