@@ -3,7 +3,7 @@ import axios from 'axios';
 import {useHistory,useParams} from 'react-router-dom';
 
 function CreateAnnouncement(){
-  const {email,id}=useParams();
+  const {username,id}=useParams();
   const [details,setDetails]=React.useState(
     {
       announcement:String,
@@ -18,11 +18,11 @@ function CreateAnnouncement(){
         announcement:details.announcement
       },
       withCredentials:true,
-      url:"http://localhost:8080/createAnnouncement/"+email+"/"+id
+      url:"http://localhost:8080/createAnnouncement/"+username+"/"+id
     }).then((res)=>{
     console.log("hello")
     });
-    history.push("/classroom/"+email+"/"+id);
+    history.push("/classroom/"+username+"/"+id);
   }
   
   
@@ -36,7 +36,7 @@ function CreateAnnouncement(){
   return(
     <div>
         <form>
-          <label for='name'>Type</label>
+          <label htmlFor='name'>Type</label>
           <input type="text" name="announcement" value={details.announcement} onChange={handleChange}/>
           <button
           onClick={(event)=>{

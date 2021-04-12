@@ -5,7 +5,7 @@ import{useHistory} from 'react-router-dom';
 function Login(){
 
   const [details,setDetails]=React.useState({
-    email:String,
+    username:String,
     password:String
   });
   const history=useHistory();
@@ -13,13 +13,13 @@ function Login(){
     axios({
       method:"POST",
       data:{
-        email:details.email,
+        username:details.username,
         password:details.password
       },
       withCredentials:true,
       url:"http://localhost:8080/login"
     }).then((res) => {
-        var queryExtender=res.data.email;
+        var queryExtender=res.data.username;
         history.push("/dashboard/"+queryExtender);
     });
   }
@@ -37,15 +37,15 @@ function Login(){
     return (
     <div>
     <form>
-    <label for="email">Email:</label>
-    <input type="email" name="email" value={details.email} onChange={handleChange}/>
-    <label for="password">Password</label>
+    <label htmlFor="email">Email:</label>
+    <input type="email" name="username" value={details.username} onChange={handleChange}/>
+    <label htmlFor="password">Password</label>
     <input type="text" name="password" value={details.password} onChange={handleChange}/>
     <button onClick={(event)=>{
       event.preventDefault();
       handleSubmit()
       setDetails({
-        email:"",
+        username:"",
         password:""
       });
 return;

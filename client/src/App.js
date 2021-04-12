@@ -17,11 +17,11 @@ function App() {
     <Route path="/"exact component={Landing}/>
     <Route path="/teacher_register" component={Teacher_Register}/>
     <Route path="/login" component={Login}/>
-    <Route path='/dashboard/:email' component={Dashboard}/>
-    <Route path="/createClassroom/:email" component={createClassroom}/>
-    <Route path="/createAnnouncement/:email/:id" component={createAnnouncement}/>
-    <Route path="/classroom/:email/:id" component={ClassPane}/>
-    <Route path="/teams/:email/:id" component={TeamPane}/>
+    <Route path='/dashboard/:username' component={Dashboard}/>
+    <Route path="/createClassroom/:username" component={createClassroom}/>
+    <Route path="/createAnnouncement/:username/:id" component={createAnnouncement}/>
+    <Route path="/classroom/:username/:id" component={ClassPane}/>
+    <Route path="/teams/:username/:id" component={TeamPane}/>
     </Switch>
     </div>
 }

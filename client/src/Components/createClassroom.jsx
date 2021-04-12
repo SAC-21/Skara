@@ -3,7 +3,7 @@ import axios from 'axios';
 import {useHistory,useParams} from 'react-router-dom';
 
 function CreateClassroom(){
-  const {email}=useParams();
+  const {username}=useParams();
   const [details,setDetails]=React.useState(
     {
       className:String,
@@ -18,11 +18,11 @@ function CreateClassroom(){
         className:details.className
       },
       withCredentials:true,
-      url:"http://localhost:8080/createClassroom/"+email
+      url:"http://localhost:8080/createClassroom/"+username
     }).then((res)=>{
     console.log("hello")
     });
-    history.push("/dashboard/"+email);
+    history.push("/dashboard/"+username);
   }
   
   
@@ -36,7 +36,7 @@ function CreateClassroom(){
   return(
     <div>
         <form>
-          <label for='name'>Classroom Name:</label>
+          <label htmlFor='name'>Classroom Name:</label>
           <input type="text" name="className" value={details.className} onChange={handleChange}/>
           <button
           onClick={(event)=>{

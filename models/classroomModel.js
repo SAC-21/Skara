@@ -1,5 +1,7 @@
 // requiring the mongoose library
 const mongoose = require('mongoose');
+const passport=require('passport');
+const passportLocalMongoose=require('passport-local-mongoose');
 
 // Defining the schema of classroom.
 const classSchema = new mongoose.Schema({
@@ -21,6 +23,7 @@ teams:[{
   ref:'team'
 }]
 });
+classSchema.plugin(passportLocalMongoose);
 const classroom = mongoose.model('classroom', classSchema);
 
 // exporting the classroom model

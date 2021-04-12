@@ -3,8 +3,8 @@ import React from 'react';
 import {Link,useParams} from 'react-router-dom';
 function Classcard(props){
 
-    const{email}=useParams();
-    const url="/classroom/"+email+"/"+props.id;
+    const{username}=useParams();
+    const url="/classroom/"+username+"/"+props.id;
     return(
     <div>
         <Link to={url}>

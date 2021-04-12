@@ -1,5 +1,7 @@
 // Requiring the mongoose module
 const mongoose = require('mongoose');
+const passport=require('passport');
+const passportLocalMongoose=require('passport-local-mongoose');
 
 // Defining the schema of students.
 const studentSchema = new mongoose.Schema({
@@ -12,6 +14,8 @@ const studentSchema = new mongoose.Schema({
     }],
     password: String
 });
+studentSchema.plugin(passportLocalMongoose);
+
 const student = mongoose.model('student', studentSchema);
 
 //exporting the student model

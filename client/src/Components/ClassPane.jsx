@@ -1,21 +1,21 @@
 import axios from 'axios';
 import React from 'react';
 import {useParams,Link} from 'react-router-dom';
-
+import Announcement from "./RenderAnnouncement";
  function ClassPane(){
-    const{email,id}=useParams();
+    const{username,id}=useParams();
     const[classData,setClassData]=React.useState([]);
     React.useEffect(()=>{
-    axios.get('http://localhost:8080/classpane/'+email+"/"+id)
+    axios.get('http://localhost:8080/classpane/'+username+"/"+id)
     .then((res)=>{
         if(res.data.class.announcements.length!==classData.length)
       {
         setClassData(res.data.class.announcements);
       }
     })
-    },[classData,email,id])
-  const url2="/teams/"+email+"/"+id;
-  const url="/createAnnouncement/"+email+"/"+id;
+    },[classData,username,id])
+  const url2="/teams/"+username+"/"+id;
+  const url="/createAnnouncement/"+username+"/"+id;
     return(<div>
         <Link to={url}>
         <li>Create Announcement</li>
@@ -23,15 +23,11 @@ import {useParams,Link} from 'react-router-dom';
         <Link to={url2}>
         <li>Teams</li>
         </Link>
-        {classData.map((obj)=>{
+        {classData.map((obj,index)=>{
          return(
-           <ul>
-          <li>{obj.author}</li>
-            <li>{obj.text}</li>
-            <li>{obj.time}</li>
-            </ul>
+<Announcement author={obj.author} text={obj.text} time={obj.time} key={index} />
         )})}
         </div>
-        )
+    )
 }
 export default ClassPane;

@@ -1,26 +1,26 @@
 import React from "react";
 import axios from 'axios';
 import {useParams} from 'react-router-dom';
-
+import TeamDetails from './RenderTeam';
 
 
 function TeamPane(){
     const[teamData,setTeamData]=React.useState([]);
-const {email,id}=useParams();
+const {username,id}=useParams();
 React.useEffect(()=>{
 axios({
     method:"GET",
-    url:"http://localhost:8080/team/"+email+"/"+id
+    url:"http://localhost:8080/team/"+username+"/"+id
 }).then((res)=>{
     setTeamData(res.data.teams);
 })
-},[]);
+},[username,id]);
 console.log(teamData);
     return(
     <div>
     <li>hello</li>
-    {teamData.map((team)=>(
-        <li>{team.teamName}</li>
+    {teamData.map((team,index)=>(
+        <TeamDetails teamName={team.teamName} key={index} />
     ))}
     </div>
 )

@@ -5,9 +5,14 @@ const mongoose = require("mongoose");
 const ejs = require("ejs");
 const morgan = require("morgan");
 const cors = require("cors");
+const bcrypt=require("bcrypt");
+const session=require('express-session');
+const passport=require('passport');
+const passportLocalMongoose=require('passport-local-mongoose');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+const saltRounds = 10;
 
 // app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
@@ -28,9 +33,19 @@ app.use(
   })
 );
 
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: false,
+}))
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 mongoose.connect("mongodb://localhost:27017/teacher", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useCreateIndex:true
 });
 
 // Requiring the models
@@ -39,6 +54,17 @@ const student = require("./models/studentModel.js");
 const teacher = require("./models/teacherModel.js");
 const team = require("./models/teamModel.js");
 
+passport.use(classroom.createStrategy());
+
+passport.serializeUser(classroom.serializeUser());
+passport.deserializeUser(classroom.deserializeUser());
+
+passport.use(teacher.createStrategy());
+
+passport.serializeUser(teacher.serializeUser());
+passport.deserializeUser(teacher.deserializeUser());
+
+
 // const teams=new team({
 //   teamName:"Hagemaru Clan",
 //   classAssociated:"606d67a51016184b78b997ea"
@@ -46,9 +72,9 @@ const team = require("./models/teamModel.js");
 // teams.save();
 
 //display dashboard of teacher (shows classes in which teacher is enrolled)
-app.get("/dashboard/:email", function (req, res) {
+app.get("/dashboard/:username", function (req, res) {
   teacher
-  .findOne({ email: req.params.email })
+  .findOne({ username: req.params.username })
   .populate("classesEnrolled")
   .exec(function (err, foundTeacher) {
     if (err) {
@@ -60,7 +86,7 @@ app.get("/dashboard/:email", function (req, res) {
 });
 
 // display info of a particular class
-app.get("/classpane/:email/:id",function(req,res){
+app.get("/classpane/:username/:id",function(req,res){
   classroom.findOne({classCode:req.params.id},function(err,foundClass){
     if(err){
       console.log(err);
@@ -71,8 +97,7 @@ app.get("/classpane/:email/:id",function(req,res){
   })
 })
 
-
-app.get("/team/:email/:id",function(req,res){
+app.get("/team/:username/:id",function(req,res){
   classroom
   .findOne({classCode:req.params.id})
   .populate("teams")
@@ -87,48 +112,84 @@ app.get("/team/:email/:id",function(req,res){
 
 //handles post request when users login or registered
 app.post("/teacher_register", function (req, res) {
+    
   const data = new teacher({
     fn: req.body.fn,
-    email: req.body.email,
-    pw: req.body.pw,
+    username: req.body.username,
+    pw: req.body.password,
     classesEnrolled: [],
-    invitesPending: [],
+    invitesPending: []
   });
-  teacher.findOne({ email: data.email }, function (err, foundTeacher) {
-    if (err) {
-      console.log(err);
-    } else {
-      if (foundTeacher) {
-        console.log("Email already exists. Try another account.");
-        // res.redirect("/login");
-      } else {
-        data.save(function (err) {
-          if (!err) {
-            res.status(200).json({ email: data.email });
+  
+  // teacher.register({username:req.body.username},req.body.pw,function(err,registeredTeacher){
+  //   if(err){
+  //     console.log(err);
+  //   }
+  //   else{
+  //     // passport.authenticate("local")(req,res,function(){
+        teacher.findOne({ username: req.body.username }, function (err, foundTeacher) {
+          if (err) {
+            console.log(err);
+          } else {
+            if (foundTeacher) {
+              console.log("Email already exists. Try another account.");
+              // res.redirect("/login");
+            } 
+            else{
+              data.save(function (err) {
+                if (!err) {
+                  res.status(200).json({ username: req.body.username });    
+                }
+              });
+              
+            }
           }
         });
-      }
-    }
-  });
+      // })
+  //   }
+  // })
+  
+      
 });
 //handles login information
 app.post("/login", function (req, res) {
-  const enteredEmail = req.body.email;
-  const enteredPassword = req.body.password;
-  teacher.findOne({ email: enteredEmail }, function (err, foundUser) {
+  
+  // const enteredDetails=new teacher({
+  //   username:req.body.username,
+  //   pw:req.body.password
+  // })
+  
+  // req.login(enteredDetails,function(err){
+  //   if(err){
+  //     console.log(err);
+  //   }
+  //   else{
+  //      passport.authenticate("local")(req,res,function(){
+  //        if(err){
+  //          console.log(err);
+  //        }
+  //        else{
+  //        }
+  //      })
+  //   }
+  // })
+  teacher.findOne({ username: enteredDetails.username }, function (err, foundUser) {
     if (err) {
       console.log(err);
     } else {
-      if (
-        foundUser &&
-        foundUser.email === enteredEmail &&
-        foundUser.pw === enteredPassword
-      ) {
-        res.status(200).json({ email: enteredEmail });
-        // Send user to dashboard
-        console.log("user found");
-      } else {
-        console.log("Enter correct password");
+      if (foundUser){  
+        // bcrypt.compare(enteredPassword, foundUser.pw, function(err, result) {
+          if(foundUser.pw===enteredDetails.pw){
+          console.log("user found");
+          res.status(200).json({ username: enteredDeatails.username });
+        }
+          else{
+            console.log("Enter correct password");
+          }
+        // });    
+      }
+     else {
+       console.log("email id does not exist")
       }
     }
   });
@@ -146,9 +207,9 @@ function makeid(length) {
   return result;
 }
 //creates classroom inside classroom model and link it with teacher id
-app.post("/createclassroom/:email", function (req, res) {
+app.post("/createclassroom/:username", function (req, res) {
   
-  teacher.findOne({ email: req.params.email }, function (err, foundTeacher) {
+  teacher.findOne({ username: req.params.username }, function (err, foundTeacher) {
     if (err) {
       console.log(err);
     } else {
@@ -174,14 +235,14 @@ app.post("/createclassroom/:email", function (req, res) {
 });
 
 // stores announcement inside classroom model 
-app.post("/createAnnouncement/:email/:id",function(req,res){
+app.post("/createAnnouncement/:username/:id",function(req,res){
   const event = new Date();
 
   classroom.findOne({ classCode: req.params.id }, function (err, foundClass) {
     if (err) {
       console.log(err);
     } else {
-      teacher.findOne({email:req.params.email},function(err,foundTeacher){
+      teacher.findOne({username:req.params.username},function(err,foundTeacher){
         const data={
           author:foundTeacher.fn,
           text:req.body.announcement,

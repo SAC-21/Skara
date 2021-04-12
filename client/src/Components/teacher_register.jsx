@@ -6,7 +6,7 @@ function Teacher_Register(){
     const history=useHistory();
     const [details,setDetails]=React.useState({
         fn:"",
-        email:"",
+        username:"",
         pw:"",
         classesEnrolled:[],
         invitesPending:[]  
@@ -16,7 +16,7 @@ function handleSubmit(){
         method:"POST",
         data:{
             fn:details.fn,
-            email:details.email,
+            username:details.username,
             pw:details.pw,
             classesEnrolled:[],
             invitesPending:[]
@@ -24,7 +24,7 @@ function handleSubmit(){
         withCredentials:true,
        url:"http://localhost:8080/teacher_register",
     }).then((res)=>{
-        var queryExtender=res.data.email;
+        var queryExtender=res.data.username;
         history.push("/dashboard/"+queryExtender);
     });
 
@@ -45,11 +45,11 @@ function handleChange(event){
     return(
         <div>
     <form >
-      <label for="fn">Name:</label>
+      <label htmlFor="fn">Name:</label>
       <input type="text" name="fn" value={details.fn} onChange={handleChange}/>
-      <label for="email">Email:</label>
-      <input type="email" name="email" value={details.email} onChange={handleChange}/>
-      <label for="pw">Password:</label>
+      <label htmlFor="email">Email:</label>
+      <input type="email" name="username" value={details.username} onChange={handleChange}/>
+      <label htmlFor="pw">Password:</label>
       <input type="password" name="pw" value={details.pw} onChange={handleChange}/>
       <button onClick={(event) => {
           
@@ -57,8 +57,8 @@ function handleChange(event){
           handleSubmit();
           setDetails({
             fn: "",
-            email: "",
-            pw: "",
+            username: "",
+            pw:"",
             classesEnrolled:[],
             invitesPending:[]
           });
